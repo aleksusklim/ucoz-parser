@@ -1,5 +1,4 @@
-﻿//<ucoz-parser-7.js>//
-
+﻿
 "use strict";
 
 // ==== функции для работы с базой ==== //
@@ -732,7 +731,7 @@ return res;
 }
 
 function Bb2Html(bb){
-var codes=[],stack={},CODE=false;
+var codes=[],stack={},code=false;
 'b,i,s,u,o,l,c,r,j,sub,sup,size,color,font,hide,spoiler,video,audio,code,quote,url,email,img,list'.split(',').map(function(t){stack[t]=1;});
 
 bb=bb.replace(/</g,'&lt;');
@@ -764,15 +763,17 @@ if(!stack[code]||stack[code]===1)return x;
 stack[code]--;
 }else if(stack[code]){
 stack[code]++;
-if()
+//if()
 }
 
 //return '['+(close?'/':'')+code+']';
 
+switch(code){
+case 'url':case 'audio':case 'video':case 'email':case 'img':if(close)return '</a>';return '<a href="'+value+'">';break;
+case 'quote':case 'spoiler':if(close)return '</blockquote>';if(value)return '<blockquote><b><i>'+value+'</i></b><br>';return '<blockquote>';break;
+}
 
-
-console.log(x,'<'+(close?'/':'')+code+(value?'='+value:'')+'>');
-return ' < ';
+return '<'+(close?'/':'')+code+(value?'='+value:'')+'>';
 });
 return bb;
 }
@@ -1080,6 +1081,18 @@ var ReparseHTML=function(html){
 return Html2Bb(PrepareHTML(ParseHTML(html)));
 }
 
+function Html2Markdown(html){
+var mark;
+
+mark=html
+.replace(/\t/g,' ')
+.replace(/\n\n+/g,'\t')
+.replace(/\n/g,'<br>\n')
+.replace(/\t/g,'\n\n');
+
+return mark;
+}
+
 '';
 
 window.Proc=function(){
@@ -1087,7 +1100,7 @@ document.getElementById('target').value=ReparseHTML(document.getElementById('sou
 }
 
 window.Proc=function(){
-document.getElementById('target').value=Bb2Html(document.getElementById('source').value);
+document.getElementById('target').value=Html2Markdown(Bb2Html(document.getElementById('source').value));
 }
 
 document.body.innerHTML='<style>textarea{width:90%;height:192px;}</style><textarea onchange="Proc();" id="source"></textarea><br /><textarea id="target"></textarea>';
@@ -1201,4 +1214,3 @@ PutToTable(POSTS,p,Log);
 
 
 
-//EOF
